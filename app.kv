@@ -16,14 +16,37 @@
 					size_hint_y: None
 					padding: [dp(20),dp(10),dp(20),dp(20)]
 					height: root.height
-					
-					Widget:
+					BoxLayout:
 						size_hint_y: .1
-					Image:
-						size_hint_x: .8
-						source: "images/resistor.png"
-						pos_hint: {'center_x': .5}
-						
+						padding: [0, dp(5), 0, dp(5)]
+						spacing: dp(10)
+						Image:
+							size_hint_x: .2
+							source: "images/resistor.png"
+							pos_hint: {'center_x': .5}
+						MDTextFieldRect:
+							size_hint_x: .4
+							text: '1'
+							font_size: self.height - dp(15)
+						MDRaisedButton:
+							size_hint_x: .15
+							size_hint_y: 1
+							text: 'kOm'
+						MDRaisedButton:
+							size_hint_x: .15
+							size_hint_y: 1
+							text: '5%'
+						MDTextFieldRect:
+							size_hint_x: .2
+							text: '0.125'
+							font_size: self.height - dp(15)
+						MDLabel:
+							size_hint_x: .05
+							text: 'Вт'
+					Widget:
+
+
+
 					
 					
 					
