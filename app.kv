@@ -1,5 +1,5 @@
-ScreenManager:
-	id: sm
+<ScreenManagement>:
+    id: sm
 	
 	MainWindow:
 		id: main_window
@@ -9,46 +9,23 @@ ScreenManager:
 			orientation: "vertical"
 			MDToolbar:
 				title: "ResistorCombinator"
-				type:"top"
+
 			ScrollView:
-				height: root.height
 				BoxLayout:
 					orientation: "vertical"
-					padding: [dp(50), 0, dp(50), 0]
+					size_hint_y: None
+					padding: [dp(20),dp(10),dp(20),dp(20)]
+					height: root.height
 					
 					Widget:
 						size_hint_y: .1
 					Image:
-						size_hint_y: .1
+						size_hint_x: .8
 						source: "images/resistor.png"
+						pos_hint: {'center_x': .5}
 						
-					BoxLayout:
-						padding: [0, dp(20), 0, dp(20)]
-						
-						Widget:
-						TextInput:
-							hint_text: "kOm"
-							size_hint_x: .5
-							size_hint_y: None
-							multiline: False
-							input_filter: "int"
-							font_size: dp(70)
-							height: self.minimum_height
-							
-						Widget:
-							size_hint_x: None
-							width: dp(25)
-						
-						MDRaisedButton:
-							text: "kOm"
-							size_hint_x: .3
-						Widget:
-							
-					MDLabel:
-						text:"="
-						font_size: dp(100)
-						halign: "center"
-					BoxLayout:
+					
+					
 					
 					
 						

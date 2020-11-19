@@ -1,13 +1,18 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
-from kivymd.uix.label import MDLabel
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager
 
+class ScreenManagement(ScreenManager):
+	pass
+
+with open("app.kv", encoding='utf8') as f:
+    app = Builder.load_string(f.read())
 
 class App(MDApp):
+	title = 'ResistorCombinator'
+
 	def build(self):
-		kv = Builder.load_file("app.kv")
-		return kv
+		return ScreenManagement()
 		
 	
 if __name__ == "__main__":				
