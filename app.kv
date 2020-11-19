@@ -1,9 +1,9 @@
 <ScreenManagement>:
     id: sm
 	
-	MainWindow:
-		id: main_window
-		name: "main_window"
+	MainScreen:
+		id: main_screen
+		name: "main_screen"
 		
 		BoxLayout:
 			orientation: "vertical"
@@ -32,6 +32,8 @@
 							size_hint_x: .15
 							size_hint_y: 1
 							text: 'kOm'
+							on_release:
+								app.drop_menu.open(self)
 						MDRaisedButton:
 							size_hint_x: .15
 							size_hint_y: 1
@@ -43,6 +45,26 @@
 						MDLabel:
 							size_hint_x: .05
 							text: 'Вт'
+					BoxLayout:
+						size_hint_y: .15
+						padding: [0, dp(5), 0, dp(5)]
+						spacing: dp(10)
+						Check:
+							id: 'chk_parallel'
+							group: 'group_connect'
+                            pos_hint: {'center_y': .5}
+                            active: True
+						Image:
+							source: "images/resistor_parallel.png"
+						Check:
+							id: 'chk_parallel'
+							group: 'group_connect'
+                            pos_hint: {'center_y': .5}
+						Image:
+							source: "images/resistor_serial.png"
+						Widget:
+						Widget:
+						Widget:
 					Widget:
 
 
@@ -53,24 +75,22 @@
 					
 						
 						
-						
-						
-					
-						
-			
-						
-						
-						
-					
+<CustomDropDown>:
+	MDRaisedButton:
+        text: "mOm"
+        on_release:
+        	app.drop_menu.dismiss()
+
 				
-				
-				
-				
-				
-			
-			
-	
-<MainWindow@Screen>:
+												
+<Check@MDCheckbox>:
+    size_hint: None, None
+    size: dp(48), dp(48)
+    allow_no_selection: False			
+											
+<MainScreen@Screen>:
+
+
 	
 	
 
