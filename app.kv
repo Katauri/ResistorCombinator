@@ -33,11 +33,13 @@
 							size_hint_y: 1
 							text: 'kOm'
 							on_release:
-								app.drop_menu.open(self)
+								app.percent_menu.open(self)
 						MDRaisedButton:
 							size_hint_x: .15
 							size_hint_y: 1
 							text: '5%'
+							on_release:
+								app.percent_menu.open(self)
 						MDTextFieldRect:
 							size_hint_x: .2
 							text: '0.125'
@@ -69,17 +71,14 @@
 
 
 
+
 					
 					
 					
 					
 						
 						
-<CustomDropDown>:
-	MDRaisedButton:
-        text: "mOm"
-        on_release:
-        	app.drop_menu.dismiss()
+
 
 				
 												
@@ -89,6 +88,15 @@
     allow_no_selection: False			
 											
 <MainScreen@Screen>:
+
+<CustomDropDown>:
+	auto_width: True
+    
+
+	MDRaisedButton:
+        text: "mOm"
+        on_release:
+        	app.drop_menu.dismiss()
 
 
 	
