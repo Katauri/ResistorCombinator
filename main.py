@@ -11,11 +11,11 @@ class ScreenManagement(ScreenManager):
     pass
 
 
-class CustomDropDown(DropDown):
+class PercentDropDown(DropDown):
     pass
 
 
-class PercentDropDown(DropDown):
+class ValueDropDown(DropDown):
     pass
 
 
@@ -24,7 +24,8 @@ class App(MDApp):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.percent_menu = CustomDropDown()
+        self.percent_menu = PercentDropDown()
+        self.value_menu = ValueDropDown()
 
     def build(self):
         return ScreenManagement()

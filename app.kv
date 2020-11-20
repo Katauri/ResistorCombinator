@@ -33,7 +33,7 @@
 							size_hint_y: 1
 							text: 'kOm'
 							on_release:
-								app.percent_menu.open(self)
+								app.value_menu.open(self)
 						MDRaisedButton:
 							size_hint_x: .15
 							size_hint_y: 1
@@ -59,7 +59,7 @@
 						Image:
 							source: "images/resistor_parallel.png"
 						Check:
-							id: 'chk_parallel'
+							id: 'chk_serial'
 							group: 'group_connect'
                             pos_hint: {'center_y': .5}
 						Image:
@@ -78,12 +78,36 @@
 											
 <MainScreen@Screen>:
 
-<CustomDropDown>:
-	auto_width: True
-    
-
+<ValueDropDown>:
 	MDRaisedButton:
         text: "mOm"
+        on_release:
+        	app.drop_menu.dismiss()
+    MDRaisedButton:
+        text: "Om"
+        on_release:
+        	app.drop_menu.dismiss()
+    MDRaisedButton:
+        text: "kOm"
+        on_release:
+        	app.drop_menu.dismiss()
+    MDRaisedButton:
+        text: "MOm"
+        on_release:
+        	app.drop_menu.dismiss()
+
+
+<PercentDropDown>:
+	MDRaisedButton:
+    	text: "5%"
+        on_release:
+        	app.drop_menu.dismiss()
+    MDRaisedButton:
+        text: "1%"
+        on_release:
+        	app.drop_menu.dismiss()
+    MDRaisedButton:
+        text: "0.5%"
         on_release:
         	app.drop_menu.dismiss()
 
