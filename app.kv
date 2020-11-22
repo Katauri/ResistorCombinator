@@ -10,106 +10,130 @@
 			MDToolbar:
 				title: "ResistorCombinator"
 
-			ScrollView:
+			BoxLayout:
+				size_hint_y: .13
+				padding: [dp(10), dp(10), dp(10), dp(5)]
+
+				spacing: dp(10)
+				Image:
+					size_hint_x: .2
+					source: "images/resistor.png"
+					pos_hint: {'center_x': .5}
+				MDTextFieldRect:
+					size_hint_x: .4
+					text: app.value
+					font_size: sp(self.height - sp(15))
+					on_text:
+						app.value = self.text
+						app.resistor_change(dimension = None, tolerance = None)
+				MDRaisedButton:
+					id: dimension_button
+					size_hint_x: .15
+					size_hint_y: 1
+					text: app.dimension
+					on_release:
+						app.dimension_menu.open(self)
+				MDRaisedButton:
+					id: tolerance_button
+					size_hint_x: .15
+					size_hint_y: 1
+					text: app.tolerance
+					on_release:
+						app.tolerance_menu.open(self)
+				MDTextFieldRect:
+					size_hint_x: .2
+					text: '0.125'
+					font_size: sp(self.height - sp(15))
+				MDLabel:
+					size_hint_x: .05
+					text: 'W'
+			BoxLayout:
+				size_hint_y: .2
+				padding: [dp(10), dp(5), dp(10), dp(5)]
+				spacing: dp(10)
 				BoxLayout:
-					orientation: "vertical"
-					size_hint_y: None
-					padding: [dp(20),dp(10),dp(20),dp(20)]
-					height: root.height
+					orientation: 'vertical'
+					size_hint_x: .3
 					BoxLayout:
-						size_hint_y: .1
-						padding: [0, dp(5), 0, dp(5)]
-						spacing: dp(10)
 						Image:
-							size_hint_x: .2
-							source: "images/resistor.png"
-							pos_hint: {'center_x': .5}
-						MDTextFieldRect:
-							size_hint_x: .4
-							text: '1'
-							font_size: self.height - dp(15)
-						MDRaisedButton:
-							size_hint_x: .15
-							size_hint_y: 1
-							text: 'kOm'
-							on_release:
-								app.value_menu.open(self)
-						MDRaisedButton:
-							size_hint_x: .15
-							size_hint_y: 1
-							text: '5%'
-							on_release:
-								app.percent_menu.open(self)
-						MDTextFieldRect:
-							size_hint_x: .2
-							text: '0.125'
-							font_size: self.height - dp(15)
-						MDLabel:
-							size_hint_x: .05
-							text: 'Вт'
-					BoxLayout:
-						size_hint_y: .15
-						padding: [0, dp(5), 0, dp(5)]
-						spacing: dp(10)
+							size_hint_x: .9
+							source: "images/resistor_parallel.png"
 						Check:
-							id: 'chk_parallel'
+							id: chk_parallel
 							group: 'group_connect'
                             pos_hint: {'center_y': .5}
                             active: True
+					BoxLayout:
 						Image:
-							source: "images/resistor_parallel.png"
+							size_hint_x: .9
+							source: "images/resistor_serial.png"
 						Check:
-							id: 'chk_serial'
+							id: chk_serial
 							group: 'group_connect'
                             pos_hint: {'center_y': .5}
-						Image:
-							source: "images/resistor_serial.png"
-						Widget:
-						Widget:
-						Widget:
-					Widget:
+                Widget:
+                	size_hint_x: .05
+				BoxLayout:
+					orientation: 'vertical'
+					size_hint_x: .15
 
-	
-												
-<Check@MDCheckbox>:
-    size_hint: None, None
-    size: dp(48), dp(48)
-    allow_no_selection: False			
-											
-<MainScreen@Screen>:
+					MDLabel:
+						text: "Max:"
+					MDLabel:
+						text: "Min:"
+				BoxLayout:
+					orientation: 'vertical'
+					size_hint_x: .15
+					
+					MDLabel:
+						text: app.value_max
+					MDLabel:
+						text: app.value_min
+				Widget:
+                	size_hint_x: .05
 
-<ValueDropDown>:
-	MDRaisedButton:
-        text: "mOm"
-        on_release:
-        	app.drop_menu.dismiss()
-    MDRaisedButton:
-        text: "Om"
-        on_release:
-        	app.drop_menu.dismiss()
-    MDRaisedButton:
-        text: "kOm"
-        on_release:
-        	app.drop_menu.dismiss()
-    MDRaisedButton:
-        text: "MOm"
-        on_release:
-        	app.drop_menu.dismiss()
+				MDLabel:
+					id: count_label
+					size_hint_x: .1
+					text: app.count
+					font_size: sp(30)
+				BoxLayout:
+					orientation: 'vertical'
+					spacing: dp(5)
+					size_hint_x: .2
 
+					MDRaisedButton:
+						size_hint_y: 1
+						size_hint_x: .7
+						pos_hint: {'center_y': .5}
+						text: '+'
+						on_release:
+							app.change_count(1)
+					MDRaisedButton:
+						size_hint_y: 1
+						size_hint_x: .7
+						pos_hint: {'center_y': .5}
+						text: '-'
+						on_release:
+							app.change_count(-1)
+			MDRaisedButton:
+				text: "Go"
+				pos_hint: {'center_x': .5}
+				size_hint_y: .1
+				size_hint_x: .5
+				on_release:
+					app.calc_combination()
 
-<PercentDropDown>:
-	MDRaisedButton:
-    	text: "5%"
-        on_release:
-        	app.drop_menu.dismiss()
-    MDRaisedButton:
-        text: "1%"
-        on_release:
-        	app.drop_menu.dismiss()
-    MDRaisedButton:
-        text: "0.5%"
-        on_release:
-        	app.drop_menu.dismiss()
+			
+			ScrollView:
+				MDList:
+					padding: [dp(10), dp(10), dp(10), dp(5)]
+					id: box
+					
+					
+					
+															
+
 
 
 	
