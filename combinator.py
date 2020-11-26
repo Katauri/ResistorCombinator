@@ -35,12 +35,12 @@ def serial_combine(value, dimension, tolerance, power, count):
 
     tiers = [list_E24, list_E96, list_E192]
     for tier in tiers:
-        index = 1
+        index = 0
         for nominal in tier:
             if nominal >= value_max:
                 break
             for next_nominal in tier[index:]:
-                if next_nominal >= value:
+                if next_nominal >= value_max:
                     break
 
                 if tier == list_E24:
@@ -49,14 +49,12 @@ def serial_combine(value, dimension, tolerance, power, count):
                     list_E96_pairs.append([nominal, next_nominal])
                 elif tier == list_E192:
                     list_E192_pairs.append([nominal, next_nominal])
-
-
             index += 1
 
 
 
 
-    print(list_E24_pairs)
+    print(list_E192_pairs)
     return combinations_list
 
 
