@@ -70,6 +70,6 @@ def serial_combine(value, dimension, tolerance, power, count):
 
 
 
-output = serial_combine(value = 560, dimension = 'Ом', tolerance = 5, power = 0, count = 3)
+output = serial_combine(value = 560, dimension = 'Ом', tolerance = 5, power = 0, count = 2)
 print(output)
 

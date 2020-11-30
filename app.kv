@@ -116,17 +116,56 @@
 						text: '-'
 						on_release:
 							app.change_count(-1)
-			MDRaisedButton:
-				text: "Go"
-				pos_hint: {'center_x': .5}
+			BoxLayout:
 				size_hint_y: .1
-				size_hint_x: .5
-				on_release:
-					app.calc_combination()
+				padding: [dp(20), dp(5), dp(20), dp(5)]
+				spacing: dp(10)
+
+				MDRaisedButton:
+					text: "E24"
+					pos_hint: {'center_x': .5}
+					size_hint_y: 1
+					size_hint_x: .15
+					on_release:
+						app.calc_combination()
+				MDRaisedButton:
+					text: "E96"
+					pos_hint: {'center_x': .5}
+					size_hint_y: 1
+					size_hint_x: .15
+					on_release:
+						app.calc_combination()
+				MDRaisedButton:
+					text: "E192"
+					pos_hint: {'center_x': .5}
+					size_hint_y: 1
+					size_hint_x: .15
+					on_release:
+						app.calc_combination()
+
+				Widget:
+					size_hint_x: .25
+
+				MDRaisedButton:
+					text: "Clear"
+					pos_hint: {'center_x': .5}
+					size_hint_y: 1
+					size_hint_x: .25
+					on_release:
+						app.calc_combination()
+				MDRaisedButton:
+					text: "Go"
+					pos_hint: {'center_x': .5}
+					size_hint_y: 1
+					size_hint_x: .25
+					on_release:
+						app.calc_combination()
 
 			
 			ScrollView:
+
 				MDList:
+					
 					padding: [dp(10), dp(10), dp(10), dp(5)]
 					id: box
 					
