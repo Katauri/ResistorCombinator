@@ -12,16 +12,23 @@ list_E24 = []
 list_E96 = []
 list_E192 = []
 
+list_nominals = []
+
 for sheet in sheets:
     num = 2
     while(sheet['A' + str(num)].value):
         if sheet == sheet_E24:
             list_E24.append(sheet['A' + str(num)].value)
+            list_nominals.append((sheet['A' + str(num)].value, 5))
         elif sheet == sheet_E96:
             list_E96.append(sheet['A' + str(num)].value)
+            list_nominals.append((sheet['A' + str(num)].value, 1))
         elif sheet == sheet_E192:
             list_E192.append(sheet['A' + str(num)].value)
+            list_nominals.append((sheet['A' + str(num)].value, 0.5))
         num += 1
+
+list_nominals.sort(key = lambda x: x[::1])
 
 
 def serial_combine(value, dimension, tolerance, power, count):
@@ -29,37 +36,40 @@ def serial_combine(value, dimension, tolerance, power, count):
     value_max = value * (1 + (tolerance / 100))
 
     combinations_list = []
-    list_E24_pairs = []
-    list_E96_pairs = []
-    list_E192_pairs = []
-
-    tiers = [list_E24, list_E96, list_E192]
-    for tier in tiers:
-        index = 1
-        for nominal in tier:
-            if nominal >= value_max:
-                break
-            for next_nominal in tier[index:]:
-                if next_nominal >= value:
-                    break
-
-                if tier == list_E24:
-                    list_E24_pairs.append([nominal, next_nominal])
-                elif tier == list_E96:
-                    list_E96_pairs.append([nominal, next_nominal])
-                elif tier == list_E192:
-                    list_E192_pairs.append([nominal, next_nominal])
 
 
-            index += 1
+    for nominal in list_nominals:
+        if value_min < nominal[0]:
+            index_max = list_nominals.index(nominal)
+            break
+
+    for nominal in list_nominals:
+        if nominal[0] > value * 0.05:
+            index_min = list_nominals.index(nominal)
+            break
+
+    list_nominals_cut = list_nominals[index_min:index_max]
+
+    if count == 2:
+        for i in list_nominals_cut[:int(len(list_nominals_cut) / 2)]:
+            for j in list_nominals_cut:
+                if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (i[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (i[1] / 100)) >= value_min:
+                    print(i, j)
+
+    elif count == 3:
+        for i in list_nominals_cut[:int(len(list_nominals_cut) / 2)]:
+            for j in list_nominals_cut:
+                for k in list_nominals_cut:
+                    if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (i[1] / 100)) + k[0] * (1 + (i[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (i[1] / 100)) + j[0] * (1 - (i[1] / 100)) >= value_min:
+                        print(i, j, k)
 
 
 
-
-    print(list_E24_pairs)
     return combinations_list
 
 
-output = serial_combine(value = 5, dimension = 'Ом', tolerance = 5, power = 0, count = 2)
+
+
+output = serial_combine(value = 560, dimension = 'Ом', tolerance = 5, power = 0, count = 3)
 print(output)
 
