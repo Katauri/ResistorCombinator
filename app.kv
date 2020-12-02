@@ -122,26 +122,35 @@
 				spacing: dp(10)
 
 				MDRaisedButton:
-					text: "E24"
+					id: e24_button
+					name: 'e24_button'
+					text: "5%"
 					pos_hint: {'center_x': .5}
 					size_hint_y: 1
 					size_hint_x: .15
+					md_bg_color: .55, .71, 0, 1
 					on_release:
-						app.calc_combination()
+						app.tolerance_button_click(self)
 				MDRaisedButton:
-					text: "E96"
+					id: e96_button
+					name: 'e96_button'
+					text: "1%"
 					pos_hint: {'center_x': .5}
 					size_hint_y: 1
 					size_hint_x: .15
+					md_bg_color: .55, .71, 0, 1
 					on_release:
-						app.calc_combination()
+						app.tolerance_button_click(self)
 				MDRaisedButton:
-					text: "E192"
+					id: e192_button
+					name: 'e192_button'
+					text: "0.5%"
 					pos_hint: {'center_x': .5}
 					size_hint_y: 1
 					size_hint_x: .15
+					md_bg_color: .55, .71, 0, 1
 					on_release:
-						app.calc_combination()
+						app.tolerance_button_click(self)
 
 				Widget:
 					size_hint_x: .25

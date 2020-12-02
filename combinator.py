@@ -51,25 +51,31 @@ def serial_combine(value, dimension, tolerance, power, count):
     list_nominals_cut = list_nominals[index_min:index_max]
 
     if count == 2:
-        for i in list_nominals_cut[:int(len(list_nominals_cut) / 2)]:
-            for j in list_nominals_cut:
-                if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (i[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (i[1] / 100)) >= value_min:
+        for i in list_nominals_cut:
+            for j in list_nominals_cut[list_nominals_cut.index(i):]:
+                if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
                     print(i, j)
 
     elif count == 3:
-        for i in list_nominals_cut[:int(len(list_nominals_cut) / 2)]:
-            for j in list_nominals_cut:
-                for k in list_nominals_cut:
-                    if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (i[1] / 100)) + k[0] * (1 + (i[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (i[1] / 100)) + j[0] * (1 - (i[1] / 100)) >= value_min:
+        for i in list_nominals_cut:
+            for j in list_nominals_cut[list_nominals_cut.index(i):]:
+                for k in list_nominals_cut[list_nominals_cut.index(j):]:
+                    if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
                         print(i, j, k)
 
+    elif count == 4:
+        for i in list_nominals_cut:
+            for j in list_nominals_cut[list_nominals_cut.index(i):]:
+                for k in list_nominals_cut[list_nominals_cut.index(j):]:
+                    for x in list_nominals_cut[list_nominals_cut.index(k):]:
+                        if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) + x[0] * (1 + (x[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) + x[0] * (1 - (x[1] / 100)) >= value_min:
+                            print(i, j, k, x)
 
 
     return combinations_list
 
 
 
-
-output = serial_combine(value = 560, dimension = 'Ом', tolerance = 5, power = 0, count = 2)
+output = serial_combine(value = 568, dimension = 'Ом', tolerance = 5, power = 0, count = 4)
 print(output)
 
