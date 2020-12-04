@@ -1,5 +1,9 @@
 from openpyxl import load_workbook
+import main
+from kivymd.uix.label import MDLabel
+from kivy.metrics import dp
 
+caption_height = dp(20)
 wb_val = load_workbook(filename = 'nominals.xlsx', data_only = True)
 
 sheet_E24 = wb_val['E24']
@@ -12,31 +16,42 @@ list_E24 = []
 list_E96 = []
 list_E192 = []
 
-list_nominals = []
+
 
 for sheet in sheets:
     num = 2
     while(sheet['A' + str(num)].value):
         if sheet == sheet_E24:
-            list_E24.append(sheet['A' + str(num)].value)
-            list_nominals.append((sheet['A' + str(num)].value, 5))
+            list_E24.append((sheet['A' + str(num)].value, 5))
         elif sheet == sheet_E96:
-            list_E96.append(sheet['A' + str(num)].value)
-            list_nominals.append((sheet['A' + str(num)].value, 1))
+            list_E96.append((sheet['A' + str(num)].value, 1))
         elif sheet == sheet_E192:
-            list_E192.append(sheet['A' + str(num)].value)
-            list_nominals.append((sheet['A' + str(num)].value, 0.5))
+            list_E192.append((sheet['A' + str(num)].value, 0.5))
         num += 1
 
-list_nominals.sort(key = lambda x: x[::1])
 
 
-def serial_combine(value, dimension, tolerance, power, count):
+
+def serial_combine(value, tolerance, power, count, tol_list, widget):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
 
     combinations_list = []
+    list_nominals = []
 
+    for tolerance in tol_list:
+        if tolerance == 'E24':
+            for nom in list_E24:
+                list_nominals.append(nom)
+        elif tolerance == 'E96':
+            for nom in list_E96:
+                list_nominals.append(nom)
+        elif tolerance == 'E192':
+            for nom in list_E192:
+                list_nominals.append(nom)
+
+
+    list_nominals.sort(key=lambda x: x[::1])
 
     for nominal in list_nominals:
         if value_min < nominal[0]:
@@ -54,14 +69,17 @@ def serial_combine(value, dimension, tolerance, power, count):
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
-                    print(i, j)
+                    output_string = 'R1:' + str(i) + 'R2' + str(j)
+                    widget.add_widget(MDLabel(text=output_string, height=caption_height))
 
     elif count == 3:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
-                        print(i, j, k)
+                        output_string = 'R1:' + str(i) + 'R2' + str(j) + 'R3' + str(k)
+                        widget.add_widget(MDLabel(text=output_string, height=caption_height))
+
 
     elif count == 4:
         for i in list_nominals_cut:
@@ -69,13 +87,12 @@ def serial_combine(value, dimension, tolerance, power, count):
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     for x in list_nominals_cut[list_nominals_cut.index(k):]:
                         if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) + x[0] * (1 + (x[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) + x[0] * (1 - (x[1] / 100)) >= value_min:
-                            print(i, j, k, x)
-
-
-    return combinations_list
+                            pass
 
 
 
-output = serial_combine(value = 568, dimension = 'Ом', tolerance = 5, power = 0, count = 4)
-print(output)
+
+
+#output = serial_combine(value = 591, tolerance = 5, power = 0, count = 3, tol_list = ['E192'])
+#print(output)
 

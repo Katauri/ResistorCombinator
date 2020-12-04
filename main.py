@@ -12,6 +12,9 @@ with open("param.kv", encoding='utf8') as f:
 caption_height = dp(20)
 apple_green_color = (.55, .71, 0, 1)
 x11_gray_color = (.75, .75, .75, 1)
+max_resistor_count = 4
+
+
 
 class ScreenManagement(ScreenManager):
     pass
@@ -43,8 +46,10 @@ class App(MDApp):
         self.tolerance_menu = ToleranceDropDown()
         self.dimension_menu = DimensionDropDown()
 
+
     def build(self):
-        return ScreenManagement()
+        sm = ScreenManagement()
+        return sm
 
     def resistor_change(self, tolerance, dimension):
         if tolerance:
@@ -57,34 +62,42 @@ class App(MDApp):
         self.value_min = str(round(float(self.value) * (1 - ((float(str(self.tolerance)[:len(str(self.tolerance)) - 1])) / 100)), 3)) + ' ' + self.dimension
 
     def calc_combination(self):
-        if self.root.ids.chk_serial.active:
-            output_string = ""
-            for num in range(int(self.count)):
-                output_string += str(num + 1) + "-vvv-: "
+        import combinator
 
-            self.root.ids.box.add_widget(MDLabel(text=output_string, height = caption_height))
+        tol_list = []
+        if self.e24_choose:
+            tol_list.append('E24')
+        if self.e96_choose:
+            tol_list.append('E96')
+        if self.e192_choose:
+            tol_list.append('E192')
+
+        if self.root.ids.chk_serial.active:
+            combinator.serial_combine(value = float(self.value), power = 0,
+                                                     tolerance = float(self.tolerance[:-1]), count = int(self.count),
+                                                     tol_list = tol_list, widget = self.root.ids.box)
+
 
     def change_count(self, value):
-        if (int(self.count) >= 2 and value > 0) or (int(self.count) > 2 and value < 0):
+        if (int(self.count) >= 2 and value > 0 and (int(self.count) < max_resistor_count)) or (int(self.count) > 2 and value < 0):
             self.count = str(int(self.count) + value)
 
     def tolerance_button_click(self, widget):
-        print(widget.name)
-        if widget.name == 'e24_button':
+        if widget.name == 'e24_button' and (self.e96_choose or self.e192_choose):
             self.e24_choose = not self.e24_choose
             if self.e24_choose:
                 widget.md_bg_color = apple_green_color
             else:
                 widget.md_bg_color = x11_gray_color
 
-        if widget.name == 'e96_button':
+        if widget.name == 'e96_button' and (self.e192_choose or self.e24_choose):
             self.e96_choose = not self.e96_choose
             if self.e96_choose:
                 widget.md_bg_color = apple_green_color
             else:
                 widget.md_bg_color = x11_gray_color
 
-        if widget.name == 'e192_button':
+        if widget.name == 'e192_button' and (self.e96_choose or self.e24_choose):
             self.e192_choose = not self.e192_choose
             if self.e192_choose:
                 widget.md_bg_color = apple_green_color
@@ -93,6 +106,7 @@ class App(MDApp):
 
 
 
+app = App()
 
 if __name__ == "__main__":
-    App().run()
+    app.run()
