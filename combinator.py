@@ -1,7 +1,6 @@
 from openpyxl import load_workbook
-import main
-from kivymd.uix.label import MDLabel
 from kivy.metrics import dp
+from kivymd.uix.label import MDLabel
 
 caption_height = dp(20)
 wb_val = load_workbook(filename = 'nominals.xlsx', data_only = True)
@@ -36,6 +35,8 @@ def serial_combine(value, tolerance, power, count, tol_list, widget):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
 
+    print('Thread func')
+
     combinations_list = []
     list_nominals = []
 
@@ -69,16 +70,21 @@ def serial_combine(value, tolerance, power, count, tol_list, widget):
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
-                    output_string = 'R1:' + str(i) + 'R2' + str(j)
-                    widget.add_widget(MDLabel(text=output_string, height=caption_height))
+                    pass
+                    # output_string = 'R1:' + str(i) + 'R2' + str(j)
+                    # widget.add_widget(MDLabel(text=output_string, height=caption_height))
+                    # print(i, j)
 
     elif count == 3:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
-                        output_string = 'R1:' + str(i) + 'R2' + str(j) + 'R3' + str(k)
-                        widget.add_widget(MDLabel(text=output_string, height=caption_height))
+                        yield(i,j,k)
+                        # output_string = 'R1:' + str(i) + 'R2' + str(j) + 'R3' + str(k)
+                        # widget.add_widget(MDLabel(text=output_string, height=caption_height))
+                        # print(i,j,k)
+
 
 
     elif count == 4:

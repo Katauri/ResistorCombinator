@@ -6,6 +6,9 @@ from kivy.properties import StringProperty
 from kivymd.uix.label import MDLabel
 from kivy.metrics import dp
 
+from threading import  Thread
+from combinator import serial_combine
+
 with open("param.kv", encoding='utf8') as f:
     param = Builder.load_string(f.read())
 
@@ -62,7 +65,7 @@ class App(MDApp):
         self.value_min = str(round(float(self.value) * (1 - ((float(str(self.tolerance)[:len(str(self.tolerance)) - 1])) / 100)), 3)) + ' ' + self.dimension
 
     def calc_combination(self):
-        import combinator
+
 
         tol_list = []
         if self.e24_choose:
@@ -72,10 +75,26 @@ class App(MDApp):
         if self.e192_choose:
             tol_list.append('E192')
 
-        if self.root.ids.chk_serial.active:
-            combinator.serial_combine(value = float(self.value), power = 0,
-                                                     tolerance = float(self.tolerance[:-1]), count = int(self.count),
-                                                     tol_list = tol_list, widget = self.root.ids.box)
+        gen = serial_combine(value=float(self.value), power=0,
+                                     tolerance = float(self.tolerance[:-1]), count = int(self.count),
+                                     tol_list = tol_list, widget = self.root.ids.box)
+
+        t = Thread(target = serial_combine, args = (100, 5, 0, 3, tol_list, self.root.ids.box))
+        t.daemon = True
+        t.start()
+
+        for i in gen:
+            self.root.ids.box.add_widget((MDLabel(text=str(i), height=caption_height)))
+            print(i)
+
+        # if self.root.ids.chk_serial.active:
+        #     gen = serial_combine(value = float(self.value), power = 0,
+        #                                              tolerance = float(self.tolerance[:-1]), count = int(self.count),
+        #                                              tol_list = tol_list, widget = self.root.ids.box)
+        #     for i in gen:
+        #
+        #         self.root.ids.box.add_widget((MDLabel(text=str(i), height=caption_height)))
+        #         print(i)
 
 
     def change_count(self, value):
