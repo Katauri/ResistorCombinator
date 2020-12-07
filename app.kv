@@ -52,73 +52,63 @@
 				padding: [dp(10), dp(5), dp(10), dp(5)]
 				spacing: dp(10)
 				BoxLayout:
-					orientation: 'vertical'
-					size_hint_x: .3
-					BoxLayout:
-						Image:
-							size_hint_x: .9
-							source: "images/resistor_parallel.png"
-						Check:
-							id: chk_parallel
-							group: 'group_connect'
-                            pos_hint: {'center_y': .5}
-                            active: True
-					BoxLayout:
-						Image:
-							size_hint_x: .9
-							source: "images/resistor_serial.png"
-						Check:
-							id: chk_serial
-							group: 'group_connect'
-                            pos_hint: {'center_y': .5}
-                Widget:
-                	size_hint_x: .05
+					size_hint_x: .5
+					Image:
+						source: "images/resistor_parallel.png"
+					Check:
+						id: chk_parallel
+						group: 'group_connect'
+                        pos_hint: {'center_y': .5}
+                        active: True
 				BoxLayout:
-					orientation: 'vertical'
-					size_hint_x: .15
+					size_hint_x: .5
+					Image:
+						source: "images/resistor_serial.png"
+					Check:
+						id: chk_serial
+						group: 'group_connect'
+                        pos_hint: {'center_y': .5}
+				BoxLayout:
 
 					MDLabel:
 						text: "Max:"
 					MDLabel:
-						text: "Min:"
-				BoxLayout:
-					orientation: 'vertical'
-					size_hint_x: .15
-					
-					MDLabel:
 						text: app.value_max
+					Widget:
+						size_hint_x: .2
+					MDLabel:
+						text: "Min:"
 					MDLabel:
 						text: app.value_min
-				Widget:
-                	size_hint_x: .05
-
-				MDLabel:
-					id: count_label
-					size_hint_x: .1
-					text: app.count
-					font_size: sp(30)
+				
 				BoxLayout:
 					orientation: 'vertical'
 					spacing: dp(5)
-					size_hint_x: .2
+					size_hint_x: .3
 
 					MDRaisedButton:
+						name: 'x2_button'
+						id: x2_button
 						size_hint_y: 1
-						size_hint_x: .7
+						size_hint_x: 1
 						pos_hint: {'center_y': .5}
-						text: '+'
+						text: 'x2'
+						md_bg_color: .73, .33, .83, 1
 						on_release:
-							app.change_count(1)
+							app.change_count(2, self)
 					MDRaisedButton:
+						name: 'x3_button'
+						id: x3_button
 						size_hint_y: 1
-						size_hint_x: .7
+						size_hint_x: 1
 						pos_hint: {'center_y': .5}
-						text: '-'
+						text: 'x3'
+						md_bg_color: .75, .75, .75, 1
 						on_release:
-							app.change_count(-1)
+							app.change_count(3, self)
 			BoxLayout:
-				size_hint_y: .1
-				padding: [dp(20), dp(5), dp(20), dp(5)]
+				size_hint_y: .11
+				padding: [dp(10), dp(5), dp(10), dp(5)]
 				spacing: dp(10)
 
 				MDRaisedButton:
@@ -172,11 +162,37 @@
 
 			
 			ScrollView:
+				id: scrlv
+				
+				TextInput:
+					id: textbox
+					multiline: True
+					readonly: True
+					size_hint: 1, None
+					height: max(self.minimum_height, scrlv.height)
+					text: ' '
 
-				MDList:
-					
-					padding: [dp(10), dp(10), dp(10), dp(5)]
-					id: box
+			BoxLayout:
+				size_hint_y: .11
+				padding: [dp(10), dp(5), dp(10), dp(5)]
+				spacing: dp(10)
+				Widget:
+					size_hint_x: .5
+				MDRaisedButton:
+					size_hint_y: 1
+					pos_hint: {'center_y': .5}
+					text: '<Prew'
+					on_release:
+						pass
+
+				MDRaisedButton:
+					size_hint_y: 1
+					pos_hint: {'center_y': .5}
+					text: 'Next>'
+					on_release:
+						pass
+				
+
 					
 					
 					

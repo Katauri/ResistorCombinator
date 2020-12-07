@@ -1,6 +1,7 @@
 from openpyxl import load_workbook
 from kivy.metrics import dp
 from kivymd.uix.label import MDLabel
+import queue
 
 caption_height = dp(20)
 wb_val = load_workbook(filename = 'nominals.xlsx', data_only = True)
@@ -31,11 +32,9 @@ for sheet in sheets:
 
 
 
-def serial_combine(value, tolerance, power, count, tol_list, widget):
+def serial_combine(value, tolerance, power, count, tol_list, q):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
-
-    print('Thread func')
 
     combinations_list = []
     list_nominals = []
@@ -55,7 +54,7 @@ def serial_combine(value, tolerance, power, count, tol_list, widget):
     list_nominals.sort(key=lambda x: x[::1])
 
     for nominal in list_nominals:
-        if value_min < nominal[0]:
+        if value * 0.95 < nominal[0]:
             index_max = list_nominals.index(nominal)
             break
 
@@ -70,30 +69,25 @@ def serial_combine(value, tolerance, power, count, tol_list, widget):
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
-                    pass
-                    # output_string = 'R1:' + str(i) + 'R2' + str(j)
-                    # widget.add_widget(MDLabel(text=output_string, height=caption_height))
-                    # print(i, j)
+                    output_string = 'R1: %s Ом %s  R2: %s Ом %s \n' % (str(i[0]), str(i[1]), str(j[0]), str(j[1]))
+                    q.put_nowait(output_string)
+
 
     elif count == 3:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
-                        yield(i,j,k)
-                        # output_string = 'R1:' + str(i) + 'R2' + str(j) + 'R3' + str(k)
-                        # widget.add_widget(MDLabel(text=output_string, height=caption_height))
-                        # print(i,j,k)
+                        q.put_nowait((i, j, k))
 
 
-
-    elif count == 4:
-        for i in list_nominals_cut:
-            for j in list_nominals_cut[list_nominals_cut.index(i):]:
-                for k in list_nominals_cut[list_nominals_cut.index(j):]:
-                    for x in list_nominals_cut[list_nominals_cut.index(k):]:
-                        if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) + x[0] * (1 + (x[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) + x[0] * (1 - (x[1] / 100)) >= value_min:
-                            pass
+    # elif count == 4:
+    #     for i in list_nominals_cut:
+    #         for j in list_nominals_cut[list_nominals_cut.index(i):]:
+    #             for k in list_nominals_cut[list_nominals_cut.index(j):]:
+    #                 for x in list_nominals_cut[list_nominals_cut.index(k):]:
+    #                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) + x[0] * (1 + (x[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) + x[0] * (1 - (x[1] / 100)) >= value_min:
+    #                         pass
 
 
 

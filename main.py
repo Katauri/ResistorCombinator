@@ -5,8 +5,11 @@ from kivy.uix.dropdown import DropDown
 from kivy.properties import StringProperty
 from kivymd.uix.label import MDLabel
 from kivy.metrics import dp
+from kivy.clock import Clock
 
 from threading import  Thread
+import queue
+
 from combinator import serial_combine
 
 with open("param.kv", encoding='utf8') as f:
@@ -15,7 +18,8 @@ with open("param.kv", encoding='utf8') as f:
 caption_height = dp(20)
 apple_green_color = (.55, .71, 0, 1)
 x11_gray_color = (.75, .75, .75, 1)
-max_resistor_count = 4
+medium_orchid_color = (.73, .33, .83, 1)
+
 
 
 
@@ -43,6 +47,11 @@ class App(MDApp):
     e24_choose = True
     e96_choose = True
     e192_choose = True
+
+    x2_choose = True
+    x3_choose = False
+
+    output_list = []
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -75,31 +84,35 @@ class App(MDApp):
         if self.e192_choose:
             tol_list.append('E192')
 
-        gen = serial_combine(value=float(self.value), power=0,
-                                     tolerance = float(self.tolerance[:-1]), count = int(self.count),
-                                     tol_list = tol_list, widget = self.root.ids.box)
 
-        t = Thread(target = serial_combine, args = (100, 5, 0, 3, tol_list, self.root.ids.box))
+        qe = queue.Queue()
+        t = Thread(target = serial_combine, args = (100, 5, 0, 2, tol_list, qe))
         t.daemon = True
         t.start()
 
-        for i in gen:
-            self.root.ids.box.add_widget((MDLabel(text=str(i), height=caption_height)))
-            print(i)
+        def render_callback(*args):
+            self.output_list.append(qe.get())
 
-        # if self.root.ids.chk_serial.active:
-        #     gen = serial_combine(value = float(self.value), power = 0,
-        #                                              tolerance = float(self.tolerance[:-1]), count = int(self.count),
-        #                                              tol_list = tol_list, widget = self.root.ids.box)
-        #     for i in gen:
-        #
-        #         self.root.ids.box.add_widget((MDLabel(text=str(i), height=caption_height)))
-        #         print(i)
+        event = Clock.schedule_interval(render_callback, 1 / 100.)
 
 
-    def change_count(self, value):
-        if (int(self.count) >= 2 and value > 0 and (int(self.count) < max_resistor_count)) or (int(self.count) > 2 and value < 0):
-            self.count = str(int(self.count) + value)
+
+
+
+
+    def change_count(self, value, widget):
+        self.count = str(value)
+        if widget.name == 'x2_button' and self.x3_choose:
+            self.x2_choose = True
+            self.x3_choose = False
+            widget.md_bg_color = medium_orchid_color
+            self.root.ids.x3_button.md_bg_color = x11_gray_color
+
+        if widget.name == 'x3_button' and self.x2_choose:
+            self.x3_choose = True
+            self.x2_choose = False
+            widget.md_bg_color = medium_orchid_color
+            self.root.ids.x2_button.md_bg_color = x11_gray_color
 
     def tolerance_button_click(self, widget):
         if widget.name == 'e24_button' and (self.e96_choose or self.e192_choose):
