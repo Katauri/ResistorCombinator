@@ -16,6 +16,8 @@ list_E24 = []
 list_E96 = []
 list_E192 = []
 
+max_str_chunk = 500
+
 
 
 for sheet in sheets:
@@ -32,7 +34,7 @@ for sheet in sheets:
 
 
 
-def serial_combine(value, tolerance, power, count, tol_list, q):
+def serial_combine(value, tolerance, power, count, tol_list, chunks):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
 
@@ -65,12 +67,19 @@ def serial_combine(value, tolerance, power, count, tol_list, q):
 
     list_nominals_cut = list_nominals[index_min:index_max]
 
+    chunk_string = ''
+    str_index = 0
+
     if count == 2:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
-                    output_string = 'R1: %s Ом %s  R2: %s Ом %s \n' % (str(i[0]), str(i[1]), str(j[0]), str(j[1]))
-                    q.put_nowait(output_string)
+                    chunk_string += 'R1: %s Ом %s  R2: %s Ом %s \n' % (str(i[0]), str(i[1]), str(j[0]), str(j[1]))
+                    str_index += 1
+                    if str_index == max_str_chunk:
+                        chunks.append(chunk_string)
+                        str_index = 0
+                        chunk_string = ''
 
 
     elif count == 3:

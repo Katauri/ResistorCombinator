@@ -85,16 +85,19 @@ class App(MDApp):
             tol_list.append('E192')
 
 
-        qe = queue.Queue()
-        t = Thread(target = serial_combine, args = (100, 5, 0, 2, tol_list, qe))
+        #qe = queue.Queue()
+        chunk_list = []
+
+        t = Thread(target = serial_combine, args = (100, 5, 0, 2, tol_list, chunk_list))
         t.daemon = True
         t.start()
 
-        def render_callback(*args):
-            self.output_list.append(qe.get())
 
-        event = Clock.schedule_interval(render_callback, 1 / 100.)
 
+        def render_first_chunk(*args):
+           self.root.ids.textbox.text = chunk_list[0]
+
+        event = Clock.schedule_once(render_first_chunk, 0.5)
 
 
 
