@@ -36,6 +36,7 @@ class DimensionDropDown(DropDown):
 
 
 class App(MDApp):
+
     title = 'ResistorCombinator'
     tolerance = StringProperty('5%')
     dimension = StringProperty('kOm')
@@ -51,7 +52,11 @@ class App(MDApp):
     x2_choose = True
     x3_choose = False
 
-    output_list = []
+    chunk_list = []
+    chunk_view_index = 0
+
+    thread_state = True
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -75,8 +80,12 @@ class App(MDApp):
 
     def calc_combination(self):
 
+        self.thread_state = True
+        self.chunk_list = []
+        self.root.ids.textbox.text = ''
 
         tol_list = []
+
         if self.e24_choose:
             tol_list.append('E24')
         if self.e96_choose:
@@ -84,20 +93,24 @@ class App(MDApp):
         if self.e192_choose:
             tol_list.append('E192')
 
-
-        #qe = queue.Queue()
-        chunk_list = []
-
-        t = Thread(target = serial_combine, args = (100, 5, 0, 2, tol_list, chunk_list))
-        t.daemon = True
-        t.start()
-
-
+        self.t = Thread(target = serial_combine, args = (float(self.value), float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list, self.thread_state))
+        self.t.daemon = True
+        if not self.t.is_alive():
+            self.t.start()
 
         def render_first_chunk(*args):
-           self.root.ids.textbox.text = chunk_list[0]
+           if self.chunk_list:
+            self.root.ids.textbox.text = self.chunk_list[0]
 
-        event = Clock.schedule_once(render_first_chunk, 0.5)
+        Clock.schedule_once(render_first_chunk, 0.25)
+
+
+    def clear(self):
+        if self.t.is_alive():
+            self.thread_state = False
+
+        self.chunk_list = []
+        self.root.ids.textbox.text = ''
 
 
 
@@ -138,6 +151,17 @@ class App(MDApp):
                 widget.md_bg_color = apple_green_color
             else:
                 widget.md_bg_color = x11_gray_color
+
+    def view_prev_chunk(self):
+        if self.chunk_view_index > 0:
+            self.chunk_view_index -= 1
+            self.root.ids.textbox.text = self.chunk_list[self.chunk_view_index]
+
+    def view_next_chunk(self):
+        if self.chunk_view_index < (len(self.chunk_list) - 1):
+            self.chunk_view_index += 1
+            self.root.ids.textbox.text = self.chunk_list[self.chunk_view_index]
+
 
 
 

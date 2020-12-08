@@ -151,7 +151,7 @@
 					size_hint_y: 1
 					size_hint_x: .25
 					on_release:
-						app.calc_combination()
+						app.clear()
 				MDRaisedButton:
 					text: "Go"
 					pos_hint: {'center_x': .5}
@@ -170,6 +170,7 @@
 					readonly: True
 					size_hint: 1, None
 					height: max(self.minimum_height, scrlv.height)
+					background_color: (1, 1, 1, 1)
 					text: ' '
 
 			BoxLayout:
@@ -181,16 +182,16 @@
 				MDRaisedButton:
 					size_hint_y: 1
 					pos_hint: {'center_y': .5}
-					text: '<Prew'
+					text: '<Prev'
 					on_release:
-						pass
+						app.view_prev_chunk()
 
 				MDRaisedButton:
 					size_hint_y: 1
 					pos_hint: {'center_y': .5}
 					text: 'Next>'
 					on_release:
-						pass
+						app.view_next_chunk()
 				
 
 					

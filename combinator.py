@@ -34,11 +34,10 @@ for sheet in sheets:
 
 
 
-def serial_combine(value, tolerance, power, count, tol_list, chunks):
+def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_state):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
 
-    combinations_list = []
     list_nominals = []
 
     for tolerance in tol_list:
@@ -70,14 +69,20 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks):
     chunk_string = ''
     str_index = 0
 
+
+
     if count == 2:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
-                    chunk_string += 'R1: %s Ом %s  R2: %s Ом %s \n' % (str(i[0]), str(i[1]), str(j[0]), str(j[1]))
+
+                    if not thread_state:
+                        return
+                    chunk_string += '  R1: '+str(i[0])+' Ом '+str(i[1])+'%' + '  R2: ' +str(j[0])+' Ом '+str(j[1])+'% \n'
                     str_index += 1
                     if str_index == max_str_chunk:
-                        chunks.append(chunk_string)
+                        print('hello')
+                        chunks.append(chunk_string[:-2])
                         str_index = 0
                         chunk_string = ''
 
@@ -88,6 +93,9 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks):
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
                         q.put_nowait((i, j, k))
+
+    if chunk_string != '':
+        chunks.append(chunk_string[:-2])
 
 
     # elif count == 4:
