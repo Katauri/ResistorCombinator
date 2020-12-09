@@ -10,7 +10,7 @@ from kivy.clock import Clock
 from threading import Thread
 import queue
 
-from combinator import serial_combine
+from combinator import serial_combine, parallel_combine
 
 with open("param.kv", encoding='utf8') as f:
     param = Builder.load_string(f.read())
@@ -83,6 +83,7 @@ class App(MDApp):
         self.chunk_list = []
         self.chunk_view_index = 0
         self.root.ids.textbox.text = ''
+        self.root.ids.caption_pagination.text = '%d/%d' % (1, 1)
 
         tol_list = []
 
@@ -103,17 +104,26 @@ class App(MDApp):
             multiplier = 10 ** (-3)
 
         value = float(self.value) * multiplier
+        if self.root.ids.chk_serial.active:
+            self.t = Thread(target=serial_combine, args=(
+            value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
+            self.thread_state, self.root.ids.caption_pagination, self.chunk_view_index))
+            self.t.daemon = True
+            if not self.t.is_alive():
+                self.t.start()
+        elif self.root.ids.chk_parallel.active:
+            self.t = Thread(target=parallel_combine, args=(
+                value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
+                self.thread_state, self.root.ids.caption_pagination, self.chunk_view_index))
+            self.t.daemon = True
+            if not self.t.is_alive():
+                self.t.start()
 
-        self.t = Thread(target=serial_combine, args=(
-        value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
-        self.thread_state))
-        self.t.daemon = True
-        if not self.t.is_alive():
-            self.t.start()
 
         def render_first_chunk(*args):
             if self.chunk_list:
                 self.root.ids.textbox.text = self.chunk_list[0]
+
 
         Clock.schedule_once(render_first_chunk, 0.25)
 
@@ -124,6 +134,7 @@ class App(MDApp):
         self.chunk_view_index = 0
         self.chunk_list = []
         self.root.ids.textbox.text = ''
+        self.root.ids.caption_pagination.text = '%d/%d' % (1, 1)
 
     def change_count(self, value, widget):
 
@@ -166,11 +177,13 @@ class App(MDApp):
         if self.chunk_view_index > 0:
             self.chunk_view_index -= 1
             self.root.ids.textbox.text = self.chunk_list[self.chunk_view_index]
+            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view_index + 1, len(self.chunk_list))
 
     def view_next_chunk(self):
         if self.chunk_view_index < (len(self.chunk_list) - 1):
             self.chunk_view_index += 1
             self.root.ids.textbox.text = self.chunk_list[self.chunk_view_index]
+            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view_index + 1, len(self.chunk_list))
 
 
 app = App()

@@ -177,8 +177,13 @@
 				size_hint_y: .11
 				padding: [dp(10), dp(5), dp(10), dp(5)]
 				spacing: dp(10)
-				Widget:
+				
+				MDLabel:
 					size_hint_x: .5
+					halign: 'center'
+					id: caption_pagination
+					text: '1/1'
+				
 				MDRaisedButton:
 					size_hint_y: 1
 					pos_hint: {'center_y': .5}
