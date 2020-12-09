@@ -78,10 +78,33 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
 
                     if not thread_state:
                         return
-                    chunk_string += '  R1: '+str(i[0])+' Ом '+str(i[1])+'%' + '  R2: ' +str(j[0])+' Ом '+str(j[1])+'% \n'
+
+                    r1 = i[0]
+                    if r1 < 1000:
+                        r1_dimension = ' Om '
+                    elif r1 < 1000000:
+                        r1_dimension = ' kOm '
+                        r1 /= 1000
+                    else:
+                        r1_dimension = ' MOm '
+                        r1 /= 1000000
+                    r1 = round(r1, 10)
+
+                    r2 = j[0]
+                    if r2 < 1000:
+                        r2_dimension = ' Om '
+                    elif r2 < 1000000:
+                        r2_dimension = ' kOm '
+                        r2 /= 1000
+                    else:
+                        r2_dimension = ' MOm '
+                        r2 /= 1000000
+
+                    r2 = round(r2, 10)
+
+                    chunk_string += '  R1: '+str(r1) + r1_dimension + str(i[1])+'%' + '  R2: ' +str(r2)+ r2_dimension +str(j[1])+'% \n'
                     str_index += 1
                     if str_index == max_str_chunk:
-                        print('hello')
                         chunks.append(chunk_string[:-2])
                         str_index = 0
                         chunk_string = ''
@@ -92,7 +115,15 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
-                        q.put_nowait((i, j, k))
+                        if not thread_state:
+                            return
+                        chunk_string += '  R1: ' + str(round(i[0], 2)) + ' Ом ' + str(i[1]) + '%' + '  R2: ' + str(
+                            round(j[0], 2)) + ' Ом ' + str(j[1]) + '%' + '  R3: ' + str(round(k[0], 2)) + ' Ом ' + str(k[1]) + '% \n'
+                        str_index += 1
+                        if str_index == max_str_chunk:
+                            chunks.append(chunk_string[:-2])
+                            str_index = 0
+                            chunk_string = ''
 
     if chunk_string != '':
         chunks.append(chunk_string[:-2])
