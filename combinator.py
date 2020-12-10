@@ -1,7 +1,6 @@
 from openpyxl import load_workbook
 from kivy.metrics import dp
-from kivymd.uix.label import MDLabel
-import queue
+
 
 caption_height = dp(20)
 wb_val = load_workbook(filename = 'nominals.xlsx', data_only = True)
@@ -34,7 +33,7 @@ for sheet in sheets:
 
 
 
-def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_state, widget_pagination, chunk_view_index):
+def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_state, widget_pagination, chunk_view):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
 
@@ -54,6 +53,9 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
 
     list_nominals.sort(key=lambda x: x[::1])
 
+    index_min = 0
+    index_max = 1
+
     for nominal in list_nominals:
         if value * 0.95 < nominal[0]:
             index_max = list_nominals.index(nominal)
@@ -70,14 +72,14 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
     str_index = 0
 
     def update_pagination():
-        widget_pagination.text = '%d/%d' % (chunk_view_index + 1, len(chunks))
+        widget_pagination.text = '%d/%d' % (chunk_view.index + 1, len(chunks))
 
     if count == 2:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
 
-                    if not thread_state:
+                    if thread_state.stop:
                         return
 
                     r1 = i[0]
@@ -117,7 +119,7 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
-                        if not thread_state:
+                        if thread_state.stop:
                             return
 
                         r1 = i[0]
@@ -169,7 +171,7 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
         update_pagination()
 
 
-def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_state, widget_pagination, chunk_view_index):
+def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_state, widget_pagination, chunk_view):
     value_min = value * (1 - (tolerance / 100))
     value_max = value * (1 + (tolerance / 100))
 
@@ -189,6 +191,9 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
 
     list_nominals.sort(key=lambda x: x[::1])
 
+    index_min = 0
+    index_max = 1
+
     for nominal in list_nominals:
         if value * 100 < nominal[0]:
             index_max = list_nominals.index(nominal)
@@ -205,14 +210,14 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
     str_index = 0
 
     def update_pagination():
-        widget_pagination.text = '%d/%d' % (chunk_view_index + 1, len(chunks))
+        widget_pagination.text = '%d/%d' % (chunk_view.index + 1, len(chunks))
 
     if count == 2:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 if (i[0] * (1 + (i[1] / 100)) * j[0] * (1 + (j[1] / 100))) / (i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100))) <= value_max and (i[0] * (1 - (i[1] / 100)) * j[0] * (1 - (j[1] / 100))) / (i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100))) >= value_min:
 
-                    if not thread_state:
+                    if thread_state.stop:
                         return
 
                     r1 = i[0]
@@ -252,7 +257,7 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
                     if (i[0] * (1 + (i[1] / 100)) * j[0] * (1 + (j[1] / 100))) / (i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100))) <= value_max and (i[0] * (1 - (i[1] / 100)) * j[0] * (1 - (j[1] / 100))) / (i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100))) >= value_min:
-                        if not thread_state:
+                        if thread_state.stop:
                             return
 
                         r1 = i[0]

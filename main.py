@@ -3,12 +3,12 @@ from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.dropdown import DropDown
 from kivy.properties import StringProperty
-from kivymd.uix.label import MDLabel
+
 from kivy.metrics import dp
 from kivy.clock import Clock
 
 from threading import Thread
-import queue
+
 
 from combinator import serial_combine, parallel_combine
 
@@ -32,6 +32,14 @@ class ToleranceDropDown(DropDown):
 class DimensionDropDown(DropDown):
     pass
 
+class ThreadState:
+    def __init__(self, stop):
+        self.stop = stop
+
+class ChunkView:
+    def __init__(self, index):
+        self.index = index
+
 
 class App(MDApp):
     title = 'ResistorCombinator'
@@ -50,9 +58,9 @@ class App(MDApp):
     x3_choose = False
 
     chunk_list = []
-    chunk_view_index = 0
 
-    thread_state = True
+    thread_state = ThreadState(stop=False)
+    chunk_view = ChunkView(index=0)
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -79,9 +87,9 @@ class App(MDApp):
 
     def calc_combination(self):
 
-        self.thread_state = True
+        self.thread_state.stop = True
         self.chunk_list = []
-        self.chunk_view_index = 0
+        self.chunk_view.index = 0
         self.root.ids.textbox.text = ''
         self.root.ids.caption_pagination.text = '%d/%d' % (1, 1)
 
@@ -94,6 +102,8 @@ class App(MDApp):
         if self.e192_choose:
             tol_list.append('E192')
 
+        multiplier = 1
+
         if self.dimension == 'Om':
             multiplier = 1
         elif self.dimension  == 'kOm':
@@ -104,34 +114,37 @@ class App(MDApp):
             multiplier = 10 ** (-3)
 
         value = float(self.value) * multiplier
-        if self.root.ids.chk_serial.active:
-            self.t = Thread(target=serial_combine, args=(
-            value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
-            self.thread_state, self.root.ids.caption_pagination, self.chunk_view_index))
-            self.t.daemon = True
-            if not self.t.is_alive():
-                self.t.start()
-        elif self.root.ids.chk_parallel.active:
-            self.t = Thread(target=parallel_combine, args=(
-                value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
-                self.thread_state, self.root.ids.caption_pagination, self.chunk_view_index))
-            self.t.daemon = True
-            if not self.t.is_alive():
-                self.t.start()
-
 
         def render_first_chunk(*args):
             if self.chunk_list:
                 self.root.ids.textbox.text = self.chunk_list[0]
 
+        def start_thread(*args):
+            self.thread_state.stop = False
+            if self.root.ids.chk_serial.active:
+                self.t = Thread(target=serial_combine, args=(
+                    value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
+                    self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
+                if not self.t.is_alive():
+                    self.t.daemon = True
+                    self.t.start()
+            elif self.root.ids.chk_parallel.active:
+                self.t = Thread(target=parallel_combine, args=(
+                    value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
+                    self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
+                if not self.t.is_alive():
+                    self.t.daemon = True
+                    self.t.start()
 
-        Clock.schedule_once(render_first_chunk, 0.25)
+        Clock.schedule_once(start_thread, 0.25)
+        Clock.schedule_once(render_first_chunk, 0.5)
 
     def clear(self):
         if self.t.is_alive():
-            self.thread_state = False
+            self.thread_state.stop = True
 
-        self.chunk_view_index = 0
+
+        self.chunk_view.index = 0
         self.chunk_list = []
         self.root.ids.textbox.text = ''
         self.root.ids.caption_pagination.text = '%d/%d' % (1, 1)
@@ -174,16 +187,16 @@ class App(MDApp):
                 widget.md_bg_color = x11_gray_color
 
     def view_prev_chunk(self):
-        if self.chunk_view_index > 0:
-            self.chunk_view_index -= 1
-            self.root.ids.textbox.text = self.chunk_list[self.chunk_view_index]
-            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view_index + 1, len(self.chunk_list))
+        if self.chunk_view.index > 0:
+            self.chunk_view.index -= 1
+            self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
+            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
 
     def view_next_chunk(self):
-        if self.chunk_view_index < (len(self.chunk_list) - 1):
-            self.chunk_view_index += 1
-            self.root.ids.textbox.text = self.chunk_list[self.chunk_view_index]
-            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view_index + 1, len(self.chunk_list))
+        if self.chunk_view.index < (len(self.chunk_list) - 1):
+            self.chunk_view.index += 1
+            self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
+            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
 
 
 app = App()
