@@ -62,6 +62,8 @@ class App(MDApp):
     thread_state = ThreadState(stop=False)
     chunk_view = ChunkView(index=0)
 
+    t = None
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tolerance_menu = ToleranceDropDown()
