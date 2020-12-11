@@ -138,6 +138,7 @@ class App(MDApp):
 
         Clock.schedule_once(start_thread, 0.25)
         Clock.schedule_once(render_first_chunk, 0.5)
+        Clock.schedule_once(render_first_chunk, 3)
 
     def clear(self):
         if self.t.is_alive():
