@@ -13,7 +13,6 @@ from threading import Thread
 
 from combinator import serial_combine, parallel_combine
 
-import cProfile
 
 with open("param.kv", encoding='utf8') as f:
     param = Builder.load_string(f.read())
