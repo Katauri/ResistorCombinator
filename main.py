@@ -3,6 +3,7 @@ from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.dropdown import DropDown
 from kivy.properties import StringProperty
+from kivmob import KivMob, TestIds
 
 from kivy.metrics import dp
 from kivy.clock import Clock
@@ -11,6 +12,8 @@ from threading import Thread
 
 
 from combinator import serial_combine, parallel_combine
+
+import cProfile
 
 with open("param.kv", encoding='utf8') as f:
     param = Builder.load_string(f.read())
@@ -41,6 +44,16 @@ class ChunkView:
         self.index = index
 
 
+def exception_cather(func):
+    def wrapper(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except Exception:
+            return False
+
+    return wrapper
+
+
 class App(MDApp):
     title = 'ResistorCombinator'
     tolerance = StringProperty('5%')
@@ -49,6 +62,7 @@ class App(MDApp):
     value = StringProperty('1')
     value_max = StringProperty('1.050 kOm')
     value_min = StringProperty('0.950 kOm')
+    power = StringProperty('0')
 
     e24_choose = True
     e96_choose = True
@@ -62,17 +76,31 @@ class App(MDApp):
     thread_state = ThreadState(stop=False)
     chunk_view = ChunkView(index=0)
 
-    t = None
+    t = Thread()
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.tolerance_menu = ToleranceDropDown()
         self.dimension_menu = DimensionDropDown()
 
+    # def on_start(self):
+    #     self.profile = cProfile.Profile()
+    #     self.profile.enable()
+    #
+    # def on_stop(self):
+    #     self.profile.disable()
+    #     self.profile.dump_stats('myapp.profile')
+
     def build(self):
+        self.ads = KivMob(TestIds.APP)
+        self.ads.new_banner(TestIds.BANNER, top_pos=False)
+        self.ads.request_banner()
+        self.ads.show_banner()
+
         sm = ScreenManagement()
         return sm
 
+    @exception_cather
     def resistor_change(self, tolerance, dimension):
         if tolerance:
             self.tolerance = str(tolerance) + '%'
@@ -87,6 +115,7 @@ class App(MDApp):
             round(float(self.value) * (1 - ((float(str(self.tolerance)[:len(str(self.tolerance)) - 1])) / 100)),
                   3)) + ' ' + self.dimension
 
+    @exception_cather
     def calc_combination(self):
 
         self.thread_state.stop = True
@@ -108,7 +137,7 @@ class App(MDApp):
 
         if self.dimension == 'Om':
             multiplier = 1
-        elif self.dimension  == 'kOm':
+        elif self.dimension == 'kOm':
             multiplier = 10 ** 3
         elif self.dimension == 'MOm':
             multiplier = 10 ** 6
@@ -117,22 +146,36 @@ class App(MDApp):
 
         value = float(self.value) * multiplier
 
+
+        if self.power == '':
+            self.power = '0'
+
+        if float(self.power) <= 90:
+            power = float(self.power)
+        else:
+            self.power = '0'
+            power = 0
+
         def render_first_chunk(*args):
             if self.chunk_list:
                 self.root.ids.textbox.text = self.chunk_list[0]
+
+        def render_chunk(*args):
+            if self.chunk_list:
+                self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
 
         def start_thread(*args):
             self.thread_state.stop = False
             if self.root.ids.chk_serial.active:
                 self.t = Thread(target=serial_combine, args=(
-                    value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
+                    value, float(self.tolerance[:-1]), power, int(self.count), tol_list, self.chunk_list,
                     self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
                 if not self.t.is_alive():
                     self.t.daemon = True
                     self.t.start()
             elif self.root.ids.chk_parallel.active:
                 self.t = Thread(target=parallel_combine, args=(
-                    value, float(self.tolerance[:-1]), 0, int(self.count), tol_list, self.chunk_list,
+                    value, float(self.tolerance[:-1]), power, int(self.count), tol_list, self.chunk_list,
                     self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
                 if not self.t.is_alive():
                     self.t.daemon = True
@@ -140,8 +183,11 @@ class App(MDApp):
 
         Clock.schedule_once(start_thread, 0.25)
         Clock.schedule_once(render_first_chunk, 0.5)
-        Clock.schedule_once(render_first_chunk, 3)
+        Clock.schedule_once(render_first_chunk, 2)
+        Clock.schedule_once(render_chunk, 5)
+        Clock.schedule_once(render_chunk, 10)
 
+    @exception_cather
     def clear(self):
         if self.t.is_alive():
             self.thread_state.stop = True
@@ -152,6 +198,7 @@ class App(MDApp):
         self.root.ids.textbox.text = ''
         self.root.ids.caption_pagination.text = '%d/%d' % (1, 1)
 
+    @exception_cather
     def change_count(self, value, widget):
 
         self.count = str(value)
@@ -167,6 +214,7 @@ class App(MDApp):
             widget.md_bg_color = medium_orchid_color
             self.root.ids.x2_button.md_bg_color = x11_gray_color
 
+    @exception_cather
     def tolerance_button_click(self, widget):
         if widget.name == 'e24_button' and (self.e96_choose or self.e192_choose):
             self.e24_choose = not self.e24_choose
@@ -189,12 +237,14 @@ class App(MDApp):
             else:
                 widget.md_bg_color = x11_gray_color
 
+    @exception_cather
     def view_prev_chunk(self):
         if self.chunk_view.index > 0:
             self.chunk_view.index -= 1
             self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
             self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
 
+    @exception_cather
     def view_next_chunk(self):
         if self.chunk_view.index < (len(self.chunk_list) - 1):
             self.chunk_view.index += 1

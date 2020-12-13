@@ -23,6 +23,7 @@
 					size_hint_x: .4
 					text: app.value
 					font_size: sp(self.height - sp(15))
+					input_filter: 'float'
 					on_text:
 						app.value = self.text
 						app.resistor_change(dimension = None, tolerance = None)
@@ -42,8 +43,11 @@
 						app.tolerance_menu.open(self)
 				MDTextFieldRect:
 					size_hint_x: .2
-					text: '0.125'
+					text: app.power
 					font_size: sp(self.height - sp(15))
+					input_filter: 'float'
+					on_text:
+						app.power = self.text
 				MDLabel:
 					size_hint_x: .05
 					text: 'W'
@@ -163,7 +167,11 @@
 			
 			ScrollView:
 				id: scrlv
+				bar_color: .98, .14, .28, 1
+				bar_inactive_color: .98, .14, .28, 1
+				bar_width: 4
 				
+
 				TextInput:
 					id: textbox
 					multiline: True
