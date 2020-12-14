@@ -212,6 +212,8 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
     if chunk_string != '':
         chunks.append(chunk_string[:-2])
         update_pagination()
+    else:
+        chunks.append('  Combination not found!')
 
 
 def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_state, widget_pagination, chunk_view):
@@ -403,6 +405,9 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
     if chunk_string != '':
         chunks.append(chunk_string[:-2])
         update_pagination()
+    else:
+        chunks.append('  Combination not found!')
+
 
 
 
