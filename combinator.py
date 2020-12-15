@@ -16,7 +16,7 @@ list_E24 = []
 list_E96 = []
 list_E192 = []
 
-max_str_chunk = 500
+max_str_chunk = 1000
 
 standart_power_nominals = [0.05, 0.063, 0.1, 0.125, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 4, 5, 8, 10, 16, 25, 40, 50, 63, 75, 80, 100]
 

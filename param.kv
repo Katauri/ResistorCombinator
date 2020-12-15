@@ -8,58 +8,77 @@
 
 
 <DimensionDropDown>:
+    auto_width: False
+
 	MDRaisedButton:
         text: "mOm"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+        
         on_release:
         	app.resistor_change(dimension = 'mOm', tolerance = None)
         	app.dimension_menu.dismiss()
     MDRaisedButton:
         text: "Om"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+       
         on_release:
         	app.resistor_change(dimension = 'Om', tolerance = None)
         	app.dimension_menu.dismiss()
     MDRaisedButton:
         text: "kOm"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+        
         on_release:
         	app.resistor_change(dimension = 'kOm', tolerance = None)
         	app.dimension_menu.dismiss()
     MDRaisedButton:
         text: "MOm"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+        
         on_release:
         	app.resistor_change(dimension = 'MOm', tolerance = None)
         	app.dimension_menu.dismiss()
 
 
 <ToleranceDropDown>:
+    auto_width: False
+    
+
     MDRaisedButton:
         text: "10%"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+
+        
         on_release:
             app.resistor_change(tolerance = 10, dimension = None)
             app.tolerance_menu.dismiss()
 	MDRaisedButton:
     	text: "5%"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+        
+       
         on_release:
         	app.resistor_change(tolerance = 5, dimension = None)
         	app.tolerance_menu.dismiss()
     MDRaisedButton:
         text: "1%"
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+        
         on_release:
         	app.resistor_change(tolerance = 1, dimension = None)
         	app.tolerance_menu.dismiss()
     MDRaisedButton:
         text: "0.5%"
-        pos_hint: {'center_x': .5}
-        size_hint_x: 1
+        md_bg_color: 0.32,.67,.95, 1
+       
         on_release:
         	app.resistor_change(tolerance = 0.5, dimension = None)
         	app.tolerance_menu.dismiss()
+
+
+
+    
+
 
 
 	

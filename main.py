@@ -240,14 +240,16 @@ class App(MDApp):
     def view_prev_chunk(self):
         if self.chunk_view.index > 0:
             self.chunk_view.index -= 1
-            self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
+            current_chunk = self.chunk_list[self.chunk_view.index]
+            self.root.ids.textbox.text = current_chunk
             self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
 
     @exception_cather
     def view_next_chunk(self):
         if self.chunk_view.index < (len(self.chunk_list) - 1):
             self.chunk_view.index += 1
-            self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
+            current_chunk = self.chunk_list[self.chunk_view.index]
+            self.root.ids.textbox.text = current_chunk
             self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
 
 
