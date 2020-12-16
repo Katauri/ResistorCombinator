@@ -16,7 +16,7 @@ list_E24 = []
 list_E96 = []
 list_E192 = []
 
-max_str_chunk = 1000
+max_str_chunk = 500
 
 standart_power_nominals = [0.05, 0.063, 0.1, 0.125, 0.25, 0.5, 0.75, 1.0, 2.0, 3.0, 4, 5, 8, 10, 16, 25, 40, 50, 63, 75, 80, 100]
 
@@ -83,10 +83,10 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
     if count == 2:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
+                if thread_state.stop:
+                    return
                 if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) >= value_min:
 
-                    if thread_state.stop:
-                        return
 
                     if power != 0:
                         pwr_r1 = q_current * i[0] * 1.05
@@ -128,7 +128,7 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
 
                     r2 = round(r2, 10)
 
-                    chunk_string += '  R1: '+str(r1) + r1_dimension + power_r1 + str(i[1])+'%' + '  R2: ' +str(r2)+ r2_dimension + power_r2 +str(j[1])+'% \n'
+                    chunk_string += 'R1: '+str(r1) + r1_dimension + power_r1 + str(i[1])+'%' + '  R2: ' +str(r2)+ r2_dimension + power_r2 +str(j[1])+'% \n'
                     str_index += 1
                     if str_index == max_str_chunk:
                         chunks.append(chunk_string[:-2])
@@ -140,9 +140,9 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
+                    if thread_state.stop:
+                        return
                     if i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) <= value_max and i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) >= value_min:
-                        if thread_state.stop:
-                            return
 
                         if power != 0:
                             pwr_r1 = q_current * i[0] * 1.05
@@ -199,7 +199,7 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
 
                         r3 = round(r3, 10)
 
-                        chunk_string += '  R1: ' + str(r1) + r1_dimension + power_r1 + str(i[1]) + '%' + '  R2: ' + str(
+                        chunk_string += 'R1: ' + str(r1) + r1_dimension + power_r1 + str(i[1]) + '%' + '  R2: ' + str(
                             r2) + r2_dimension + power_r2 + str(j[1]) + '%'  + '  R3: ' + str(r3) + r3_dimension + power_r3 + str(k[1]) + '% \n'
                         str_index += 1
                         if str_index == max_str_chunk:
@@ -207,13 +207,16 @@ def serial_combine(value, tolerance, power, count, tol_list, chunks, thread_stat
                             str_index = 0
                             chunk_string = ''
                             update_pagination()
-                            time.sleep(0.01)
+                            if thread_state.stop:
+                                return
+                            time.sleep(0.1)
+
 
     if chunk_string != '':
         chunks.append(chunk_string[:-2])
         update_pagination()
     else:
-        chunks.append('  Combination not found!')
+        chunks.append('Combination not found!')
 
 
 def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_state, widget_pagination, chunk_view):
@@ -273,10 +276,9 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
     if count == 2:
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
+                if thread_state.stop:
+                    return
                 if (i[0] * (1 + (i[1] / 100)) * j[0] * (1 + (j[1] / 100))) / (i[0] * (1 + (i[1] / 100)) + j[0] * (1 + (j[1] / 100))) <= value_max and (i[0] * (1 - (i[1] / 100)) * j[0] * (1 - (j[1] / 100))) / (i[0] * (1 - (i[1] / 100)) + j[0] * (1 - (j[1] / 100))) >= value_min:
-
-                    if thread_state.stop:
-                        return
 
                     if power != 0:
                         pwr_r1 = (q_voltage / i[0]) * 1.05
@@ -315,7 +317,7 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
 
                     r2 = round(r2, 10)
 
-                    chunk_string += '  R1: '+str(r1) + r1_dimension + power_r1 + str(i[1])+'%' + '  R2: ' +str(r2)+ r2_dimension + power_r2 + str(j[1])+'% \n'
+                    chunk_string += 'R1: '+str(r1) + r1_dimension + power_r1 + str(i[1])+'%' + '  R2: ' +str(r2)+ r2_dimension + power_r2 + str(j[1])+'% \n'
                     str_index += 1
                     if str_index == max_str_chunk:
                         chunks.append(chunk_string[:-2])
@@ -328,13 +330,12 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
         for i in list_nominals_cut:
             for j in list_nominals_cut[list_nominals_cut.index(i):]:
                 for k in list_nominals_cut[list_nominals_cut.index(j):]:
+                    if thread_state.stop:
+                        return
                     r2_r3_max = (j[0] * (1 + (j[1] / 100)) * k[0] * (1 + (k[1] / 100)))
                     r2_r3_min = (j[0] * (1 - (j[1] / 100)) * k[0] * (1 - (k[1] / 100)))
+
                     if (r2_r3_max / (j[0] * (1 + (j[1] / 100)) + k[0] * (1 + (k[1] / 100)) + r2_r3_max / (i[0] * (1 + (i[1] / 100))))) <= value_max and (r2_r3_min / (j[0] * (1 - (j[1] / 100)) + k[0] * (1 - (k[1] / 100)) + r2_r3_min / (i[0] * (1 - (i[1] / 100))))) >= value_min:
-
-                        if thread_state.stop:
-                            return
-
 
                         if power != 0:
                             pwr_r1 = (q_voltage / i[0]) * 1.05
@@ -391,7 +392,7 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
 
                         r3 = round(r3, 10)
 
-                        chunk_string += '  R1: ' + str(r1) + r1_dimension + power_r1 + str(i[1]) + '%' + '  R2: ' + str(
+                        chunk_string += 'R1: ' + str(r1) + r1_dimension + power_r1 + str(i[1]) + '%' + '  R2: ' + str(
                             r2) + r2_dimension + power_r2 + str(j[1]) + '%'  + '  R3: ' + str(r3) + r3_dimension + power_r3 + str(k[1]) + '% \n'
                         str_index += 1
                         if str_index == max_str_chunk:
@@ -399,14 +400,17 @@ def parallel_combine(value, tolerance, power, count, tol_list, chunks, thread_st
                             str_index = 0
                             chunk_string = ''
                             update_pagination()
+                            if thread_state.stop:
+                                return
+                            time.sleep(0.1)
 
-                            time.sleep(0.01)
+
 
     if chunk_string != '':
         chunks.append(chunk_string[:-2])
         update_pagination()
     else:
-        chunks.append('  Combination not found!')
+        chunks.append('Combination not found!')
 
 
 

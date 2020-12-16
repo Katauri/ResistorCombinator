@@ -2,13 +2,17 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
 from kivy.uix.dropdown import DropDown
+from kivymd.uix.menu import MDDropdownMenu
 from kivy.properties import StringProperty
+from kivy.properties import ObjectProperty
+
 from kivmob import KivMob, TestIds
 
 from kivy.metrics import dp
 from kivy.clock import Clock
 
 from threading import Thread
+
 
 
 from combinator import serial_combine, parallel_combine
@@ -63,6 +67,8 @@ class App(MDApp):
     value_min = StringProperty('0.950 kOm')
     power = StringProperty('0')
 
+    dimension_menu = ObjectProperty()
+
     e24_choose = True
     e96_choose = True
     e192_choose = True
@@ -77,18 +83,23 @@ class App(MDApp):
 
     t = Thread()
 
+    def on_start(self):
+        dimension_menu_items = [{"text": "10%"}, {"text": "5%"}, {"text": "1%"}, {"text": "0.5%"}]
+
+        self.dimension_menu = MDDropdownMenu(
+            caller=self.root.ids.dimension_button,
+            items=dimension_menu_items,
+            width_mult = 3
+        )
+        self.dimension_menu.bind(on_release=self.resistor_change)
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.tolerance_menu = ToleranceDropDown()
-        self.dimension_menu = DimensionDropDown()
+        # self.tolerance_menu = ToleranceDropDown()
+        # self.dimension_menu = DimensionDropDown()
 
-    # def on_start(self):
-    #     self.profile = cProfile.Profile()
-    #     self.profile.enable()
-    #
-    # def on_stop(self):
-    #     self.profile.disable()
-    #     self.profile.dump_stats('myapp.profile')
+
+
 
     def build(self):
         self.ads = KivMob(TestIds.APP)
@@ -118,6 +129,7 @@ class App(MDApp):
     def calc_combination(self):
 
         self.thread_state.stop = True
+
         self.chunk_list = []
         self.chunk_view.index = 0
         self.root.ids.textbox.text = ''
@@ -164,20 +176,22 @@ class App(MDApp):
                 self.root.ids.textbox.text = self.chunk_list[self.chunk_view.index]
 
         def start_thread(*args):
-            self.thread_state.stop = False
             if self.root.ids.chk_serial.active:
-                self.t = Thread(target=serial_combine, args=(
-                    value, float(self.tolerance[:-1]), power, int(self.count), tol_list, self.chunk_list,
-                    self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
                 if not self.t.is_alive():
+                    self.t = Thread(target=serial_combine, args=(
+                        value, float(self.tolerance[:-1]), power, int(self.count), tol_list, self.chunk_list,
+                        self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
                     self.t.daemon = True
+                    self.thread_state.stop = False
                     self.t.start()
+
             elif self.root.ids.chk_parallel.active:
-                self.t = Thread(target=parallel_combine, args=(
-                    value, float(self.tolerance[:-1]), power, int(self.count), tol_list, self.chunk_list,
-                    self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
                 if not self.t.is_alive():
+                    self.t = Thread(target=parallel_combine, args=(
+                        value, float(self.tolerance[:-1]), power, int(self.count), tol_list, self.chunk_list,
+                        self.thread_state, self.root.ids.caption_pagination, self.chunk_view))
                     self.t.daemon = True
+                    self.thread_state.stop = False
                     self.t.start()
 
         Clock.schedule_once(start_thread, 0.25)
