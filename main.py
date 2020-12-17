@@ -84,19 +84,44 @@ class App(MDApp):
     t = Thread()
 
     def on_start(self):
-        dimension_menu_items = [{"text": "10%"}, {"text": "5%"}, {"text": "1%"}, {"text": "0.5%"}]
+        dimension_menu_items = [{"text": "mOm"}, {"text": "Om"}, {"text": "kOm"}, {"text": "MOm"}]
+        tolerance_menu_items = [{"text": "10%"}, {"text": "5%"}, {"text": "1%"}, {"text": "0.5%"}]
 
         self.dimension_menu = MDDropdownMenu(
-            caller=self.root.ids.dimension_button,
-            items=dimension_menu_items,
-            width_mult = 3
+            caller = self.root.ids.dimension_button,
+            items = dimension_menu_items,
+            width_mult = 2,
+            background_color = [0.32,.67,.95, 1]
         )
-        self.dimension_menu.bind(on_release=self.resistor_change)
+
+        self.tolerance_menu = MDDropdownMenu(
+            caller = self.root.ids.tolerance_button,
+            items = tolerance_menu_items,
+            width_mult = 2,
+            background_color=[0.32, .67, .95, 1]
+        )
+
+        self.dimension_menu.bind(on_release=self.dimension_menu_callback)
+        self.tolerance_menu.bind(on_release=self.tolerance_menu_callback)
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # self.tolerance_menu = ToleranceDropDown()
-        # self.dimension_menu = DimensionDropDown()
+
+
+    def dimension_menu_callback(self, instance_menu, instance_menu_item):
+        self.resistor_change(dimension = instance_menu_item.text, tolerance = None)
+        instance_menu.dismiss()
+
+
+    def tolerance_menu_callback(self, instance_menu, instance_menu_item):
+        self.resistor_change(dimension=None, tolerance=instance_menu_item.text)
+        self.resistor_change()
+        instance_menu.dismiss()
+
+
+
+
 
 
 
@@ -113,7 +138,7 @@ class App(MDApp):
     @exception_cather
     def resistor_change(self, tolerance, dimension):
         if tolerance:
-            self.tolerance = str(tolerance) + '%'
+            self.tolerance = tolerance
 
         if dimension:
             self.dimension = dimension
