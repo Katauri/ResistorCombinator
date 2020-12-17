@@ -8,17 +8,12 @@ from kivy.properties import ObjectProperty
 
 from kivmob import KivMob, TestIds
 
-from kivy.metrics import dp
 from kivy.clock import Clock
 
 from threading import Thread
 
-
-
 from combinator import serial_combine, parallel_combine
 
-
-caption_height = dp(20)
 apple_green_color = (.55, .71, 0, 1)
 x11_gray_color = (.75, .75, .75, 1)
 medium_orchid_color = (.73, .33, .83, 1)
