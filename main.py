@@ -18,9 +18,6 @@ from threading import Thread
 from combinator import serial_combine, parallel_combine
 
 
-with open("param.kv", encoding='utf8') as f:
-    param = Builder.load_string(f.read())
-
 caption_height = dp(20)
 apple_green_color = (.55, .71, 0, 1)
 x11_gray_color = (.75, .75, .75, 1)
