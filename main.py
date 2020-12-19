@@ -22,14 +22,6 @@ medium_orchid_color = (.73, .33, .83, 1)
 class ScreenManagement(ScreenManager):
     pass
 
-
-class ToleranceDropDown(DropDown):
-    pass
-
-
-class DimensionDropDown(DropDown):
-    pass
-
 class ThreadState:
     def __init__(self, stop):
         self.stop = stop
@@ -49,6 +41,9 @@ def exception_cather(func):
     return wrapper
 
 
+Builder.load_file('app_layout.kv')
+
+
 class App(MDApp):
     title = 'ResistorCombinator'
     tolerance = StringProperty('5%')
@@ -63,7 +58,7 @@ class App(MDApp):
 
     e24_choose = True
     e96_choose = True
-    e192_choose = True
+    e192_choose = False
 
     x2_choose = True
     x3_choose = False
