@@ -1,7 +1,6 @@
 from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivy.uix.screenmanager import ScreenManager
-from kivy.uix.dropdown import DropDown
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.properties import StringProperty
 from kivy.properties import ObjectProperty
@@ -262,21 +261,29 @@ class App(MDApp):
             else:
                 widget.md_bg_color = x11_gray_color
 
+
     @exception_cather
     def view_prev_chunk(self):
+        def render(*args):
+            self.root.ids.textbox.text = current_chunk
+            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
         if self.chunk_view.index > 0:
             self.chunk_view.index -= 1
             current_chunk = self.chunk_list[self.chunk_view.index]
-            self.root.ids.textbox.text = current_chunk
-            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+            Clock.schedule_once(render, 0.25)
+
+
 
     @exception_cather
     def view_next_chunk(self):
+        def render(*args):
+            self.root.ids.textbox.text = current_chunk
+            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+
         if self.chunk_view.index < (len(self.chunk_list) - 1):
             self.chunk_view.index += 1
             current_chunk = self.chunk_list[self.chunk_view.index]
-            self.root.ids.textbox.text = current_chunk
-            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+            Clock.schedule_once(render, 0.25)
 
 
 app = App()
