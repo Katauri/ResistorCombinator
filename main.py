@@ -69,6 +69,8 @@ class App(MDApp):
 
     t = Thread()
 
+    render_thread = Thread()
+
     def on_start(self):
         dimension_menu_items = [{"text": "mOm"}, {"text": "Om"}, {"text": "kOm"}, {"text": "MOm"}]
         tolerance_menu_items = [{"text": "10%"}, {"text": "5%"}, {"text": "1%"}, {"text": "0.5%"}]
@@ -265,8 +267,14 @@ class App(MDApp):
     @exception_cather
     def view_prev_chunk(self):
         def render(*args):
-            self.root.ids.textbox.text = current_chunk
-            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+            def draw():
+                self.root.ids.textbox.text = current_chunk
+                self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+
+            if not self.render_thread.is_alive():
+                self.render_thread = Thread(target = draw)
+                self.render_thread.daemon = True
+                self.render_thread.start()
         if self.chunk_view.index > 0:
             self.chunk_view.index -= 1
             current_chunk = self.chunk_list[self.chunk_view.index]
@@ -277,8 +285,14 @@ class App(MDApp):
     @exception_cather
     def view_next_chunk(self):
         def render(*args):
-            self.root.ids.textbox.text = current_chunk
-            self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+            def draw():
+                self.root.ids.textbox.text = current_chunk
+                self.root.ids.caption_pagination.text = '%d/%d' % (self.chunk_view.index + 1, len(self.chunk_list))
+
+            if not self.render_thread.is_alive():
+                self.render_thread = Thread(target=draw)
+                self.render_thread.daemon = True
+                self.render_thread.start()
 
         if self.chunk_view.index < (len(self.chunk_list) - 1):
             self.chunk_view.index += 1
